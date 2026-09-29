@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>外币现钞兑换预约与券别核对平台</title>
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="dot"></span>外币现钞兑换预约 · 券别核对平台</div>
+  <div class="branch-switch">
+    当前柜面
+    <select id="counterBranch"></select>
+  </div>
+  <div class="teller-switch">
+    当前柜员
+    <select id="currentTeller"></select>
+    <span id="tellerRole" class="muted" style="color:#cdd8ea"></span>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-page="inventory" class="active">币种库存</button>
+  <button data-page="calendar">预约日历</button>
+  <button data-page="fx">汇率版本</button>
+  <button data-page="verify">柜面核验</button>
+  <button data-page="deliver">现钞交付</button>
+  <button data-page="review">差额复核 <span id="diffBadge"></span></button>
+</nav>
+
+<main>
+  <!-- 1. 币种库存 -->
+  <section class="page active" id="page-inventory">
+    <div class="page-head">
+      <h2>币种库存矩阵</h2>
+      <span class="muted">可用 = 总量 − 锁定；黄色锁定数为已被预约占用</span>
+      <span class="spacer"></span>
+      <button class="btn lemon" onclick="App.openCreate()">＋ 新建预约</button>
+      <button class="btn ghost" onclick="App.loadInventory()">刷新</button>
+    </div>
+    <div class="matrix-tabs" id="matrixTabs"></div>
+    <div class="card"><div id="matrixWrap"></div></div>
+    <div class="legend">示例：<b>45</b> 可用张，下方灰字为 总量 / <span class="locked">锁定</span></div>
+  </section>
+
+  <!-- 2. 预约日历 -->
+  <section class="page" id="page-calendar">
+    <div class="page-head">
+      <h2>预约日历</h2>
+      <span class="muted">预约卡突出取钞期限；到期未到场由系统扫描释放库存</span>
+      <span class="spacer"></span>
+      <button class="btn lemon" onclick="App.openCreate()">＋ 新建预约</button>
+      <button class="btn ghost" onclick="App.runExpireScan()">到期扫描</button>
+    </div>
+    <div id="calendarWrap" class="calendar-grid"></div>
+  </section>
+
+  <!-- 3. 汇率版本 -->
+  <section class="page" id="page-fx">
+    <div class="page-head">
+      <h2>汇率版本</h2>
+      <span class="muted">预约金额按<b>客户确认当日生效版本</b>快照，历史版本不可改</span>
+      <span class="spacer"></span>
+    </div>
+    <div class="card">
+      <h3>发布新版本（仅主管）</h3>
+      <div class="form-row">
+        <label>币种<select id="pubCurrency"></select></label>
+        <label>牌价日期<input type="date" id="pubDate"></label>
+        <label>汇率（1 外币兑人民币，留空取模拟牌价）<input type="text" id="pubRate" placeholder="如 7.1200"></label>
+        <label style="display:flex;align-items:flex-end"><button class="btn" onclick="App.publishRate()">发布</button></label>
+      </div>
+    </div>
+    <div class="card"><table class="data" id="fxTable"></table></div>
+  </section>
+
+  <!-- 4. 柜面核验 -->
+  <section class="page" id="page-verify">
+    <div class="page-head">
+      <h2>柜面核验</h2>
+      <span class="muted">柜员核对客户预约：网点 / 状态 / 有效期 / 汇率快照 / 锁库一致</span>
+    </div>
+    <div class="card">
+      <div class="form-row">
+        <label>预约号<input type="text" id="verifyCode" placeholder="AP260929xxxx"></label>
+        <label style="display:flex;align-items:flex-end">
+          <button class="btn lemon" onclick="App.runVerify()">核验</button>
+        </label>
+      </div>
+      <div id="verifyResult"></div>
+    </div>
+  </section>
+
+  <!-- 5. 现钞交付 -->
+  <section class="page" id="page-deliver">
+    <div class="page-head">
+      <h2>现钞交付</h2>
+      <span class="muted">按实点券别核对，金额取确认时快照；重复提交幂等不重复出库</span>
+    </div>
+    <div class="card">
+      <div class="form-row">
+        <label>预约号<input type="text" id="deliverCode" placeholder="AP260929xxxx"></label>
+        <label style="display:flex;align-items:flex-end">
+          <button class="btn" onclick="App.loadDeliver()">载入预约</button>
+        </label>
+      </div>
+      <div id="deliverWrap"></div>
+    </div>
+  </section>
+
+  <!-- 6. 差额复核 -->
+  <section class="page" id="page-review">
+    <div class="page-head">
+      <h2>差额复核</h2>
+      <span class="muted">预约数量 / 实点数量 / 复核数量三栏对照，仅主管可复核，复核后冻结</span>
+      <span class="spacer"></span>
+      <button class="btn ghost" onclick="App.loadDiffs()">刷新</button>
+    </div>
+    <div id="reviewWrap"></div>
+  </section>
+</main>
+
+<!-- 通用弹窗 -->
+<div class="modal-mask" id="modalMask">
+  <div class="modal" id="modalBody"></div>
+</div>
+<div class="flash" id="flash"></div>
+
+<script src="/static/app.js"></script>
+</body>
+</html>
