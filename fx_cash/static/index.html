@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>外币现钞兑换预约与券别核对平台</title>
+<link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">
+    <span class="brand-mark">FX</span>
+    <div>
+      <h1>外币现钞兑换 · 预约与券别核对</h1>
+      <p class="brand-sub">币种 / 券别 / 网点库存 / 汇率快照 / 柜面复核（演示数据均为虚构）</p>
+    </div>
+  </div>
+  <div class="teller-switch">
+    <label>当前操作员</label>
+    <select id="tellerSelect"></select>
+    <span id="tellerRole" class="role-badge"></span>
+  </div>
+</header>
+
+<nav class="tabs" id="tabs">
+  <button data-view="inventory" class="tab active">币种库存</button>
+  <button data-view="calendar" class="tab">预约日历</button>
+  <button data-view="rates" class="tab">汇率版本</button>
+  <button data-view="counter" class="tab">柜面核验</button>
+  <button data-view="delivery" class="tab">现钞交付</button>
+  <button data-view="review" class="tab">差额复核</button>
+</nav>
+
+<main id="view"></main>
+
+<div id="toast" class="toast hidden"></div>
+<script src="/static/app.js"></script>
+</body>
+</html>
